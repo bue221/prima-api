@@ -10,18 +10,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id Int @id @default(autoincrement())
-  name String @unique
-  quantity Int @default(0)
-  price Int @default(999)
-  createdAt DateTime @default(now())
-  category Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
+model Especialidad {
+  id                 Int            @id @default(autoincrement())
+  nombreEspecialidad String
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  Especialista       Especialista[]
+  Paciente           Paciente[]
+
+  @@map("Especialidad")
 }
 
-model Category {
-  id Int @id @default(autoincrement())
-  name String @unique
-  products Product[]
+model Especialista {
+  documento      Int           @id
+  nombre         String
+  apellido       String
+  tipoDocumento  String
+  idEspecialidad Int?
+  titulo         String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  especialidad   Especialidad? @relation(fields: [idEspecialidad], references: [id])
+
+  @@map("Especialista")
+}
+
+model Paciente {
+  documento          Int           @id
+  nombre             String
+  apellido           String
+  tipoDocumento      String
+  telefonoContacto   Int?
+  telefonoEmergencia Int?
+  urlFoto            String?
+  urlHistoria        String?
+  idEspecialidad     Int?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  especialidad       Especialidad? @relation(fields: [idEspecialidad], references: [id])
+  examenes           Examen[]
+  Familiar           Familiar[]
+
+  @@map("Paciente")
+}
+
+model Examen {
+  id                Int       @id @default(autoincrement())
+  nombre            String
+  urlPdf            String?
+  documentoPaciente Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  paciente          Paciente? @relation(fields: [documentoPaciente], references: [documento])
+
+  @@map("Examen")
+}
+
+model Familiar {
+  documento         Int       @id
+  nombre            String
+  apellido          String
+  tipoDocumento     String
+  documentoPaciente Int?
+  urlFoto           String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  paciente          Paciente? @relation(fields: [documentoPaciente], references: [documento])
+
+  @@map("Familiar")
 }
